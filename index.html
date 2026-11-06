@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grand Concert Simulator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #101322;
+    color: white;
+}
+
+header {
+    text-align: center;
+    padding: 25px 12px;
+    background: linear-gradient(120deg, #24154c, #143c56);
+}
+
+header h1 {
+    margin: 0 0 8px;
+}
+
+header p {
+    color: #c7c9dc;
+    margin: 0;
+}
+
+main {
+    max-width: 1050px;
+    margin: auto;
+    padding: 18px;
+}
+
+.panel {
+    background: #1b2033;
+    padding: 18px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+button, select, input {
+    accent-color: #a78bfa;
+}
+
+button, select {
+    border: 1px solid #444b67;
+    background: #292f47;
+    color: white;
+    padding: 10px;
+    border-radius: 7px;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:hover {
+    background: #454b6b;
+}
+
+.primary {
+    background: #7c3aed;
+    border-color: #7c3aed;
+}
+
+.instrument {
+    background: #222940;
+    padding: 14px;
+    border-radius: 10px;
+    margin-top: 12px;
+    border: 1px solid #353d59;
+}
+
+.instrument-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.instrument-name {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.small {
+    font-size: 12px;
+    color: #b9c0d9;
+    margin-top: 5px;
+}
+
+.notes {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(36px, 1fr));
+    gap: 6px;
+    margin-top: 14px;
+}
+
+.step {
+    min-width: 0;
+    padding: 8px 2px;
+    font-size: 12px;
+    text-align: center;
+    background: #343b55;
+    border: 1px solid #4c5573;
+}
+
+.step.active {
+    background: #8b5cf6;
+    border-color: #c4b5fd;
+    color: white;
+}
+
+.step.playing {
+    outline: 3px solid #facc15;
+    outline-offset: 1px;
+}
+
+input[type="range"] {
+    width: 110px;
+}
+
+label {
+    font-size: 13px;
+    color: #d7daeb;
+}
+
+#status {
+    color: #c4b5fd;
+}
+
+.meter {
+    display: flex;
+    gap: 4px;
+    height: 22px;
+    margin-top: 14px;
+}
+
+.meter span {
+    flex: 1;
+    background: #303650;
+    border-radius: 3px;
+}
+
+.meter span.on {
+    background: #a78bfa;
+}
+
+@media (max-width: 500px) {
+    main {
+        padding: 10px;
+    }
+
+    .notes {
+        gap: 3px;
+    }
+
+    .step {
+        font-size: 10px;
+        padding: 8px 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎼 GRAND CONCERT</h1>
+    <p>Virtual Orchestra & Music Sequencer</p>
+</header>
+
+<main>
+
+    <section class="panel">
+        <h2>🎛️ Konduktor</h2>
+
+        <div class="toolbar">
+
+            <label>
+                Tempo (BPM)<br>
+                <input id="tempo" type="number"
+                    min="40" max="200"
+                    value="100" style="width:90px">
+            </label>
+
+            <label>
+                Tangga nada<br>
+                <select id="scale">
+                    <option value="C">C Mayor</option>
+                    <option value="G">G Mayor</option>
+                    <option value="D">D Mayor</option>
+                    <option value="A">A Minor</option>
+                    <option value="F">F Mayor</option>
+                </select>
+            </label>
+
+            <button id="play" class="primary">
+                ▶ Mainkan Konser
+            </button>
+
+            <button id="stop">
+                ■ Stop
+            </button>
+
+            <button id="reset">
+                ↺ Reset
+            </button>
+
+        </div>
+
+        <p id="status">Siap untuk konser.</p>
+
+        <div class="meter" id="meter">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+    </section>
+
+    <section class="panel">
+
+        <h2>🎻 Panggung Instrumen</h2>
+
+        <p class="small">
+            Klik nada pada setiap ketukan untuk mengaktifkan
+            atau menonaktifkannya. Pilih nada melalui menu
+            pada tiap kotak.
+        </p>
+
+        <div id="instruments"></div>
+
+    </section>
+
+    <section class="panel">
+
+        <h3>ℹ️ Cara menggunakan</h3>
+
+        <p>1. Pilih tangga nada dan tempo konser.</p>
+        <p>2. Klik kotak nada untuk mengaktifkan ketukan.</p>
+        <p>3. Ubah pilihan nada pada kotak yang aktif.</p>
+        <p>4. Tekan Mainkan Konser untuk mendengar semua instrumen.</p>
+
+        <p class="small">
+            Catatan: suara dibuat secara sintetis.
+            Drum menggunakan bunyi perkusi sederhana,
+            bukan sampel drum asli.
+        </p>
+
+    </section>
+
+</main>
+
+<!-- Menghubungkan file JavaScript -->
+<script src="script.js"></script>
+
+</body>
+</html>
